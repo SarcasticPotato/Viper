@@ -59,8 +59,20 @@ export default class LoginScreen extends React.Component<{}, State> {
   }
 
   _signInAsync = async () => {
-    await AsyncStorage.setItem('userToken', 'abc');
-    // @ts-ignore
-    this.props.navigation.navigate('App');
+    // await AsyncStorage.setItem('userToken', 'abc');
+    let formdata = new FormData();
+    formdata.append("username", this.state.username);
+    formdata.append("password", this.state.password);
+    let response = await fetch(this.state.url + "/api/login", {
+      method: 'POST',
+      body: formdata,
+    });
+    let sessionId = await response.text();
+    console.log(sessionId);
+    if (sessionId) {
+      // await AsyncStorage.setItem('sessionId', sessionId);
+      // @ts-ignore
+      this.props.navigation.navigate('App');
+    }
   };
 }
