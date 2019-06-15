@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Container, Header, Title, Button, Left, Right, Body, Icon } from 'native-base';
+import {Container, Header, Title, Button, Left, Right, Body, Icon, Content, Text} from 'native-base';
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
-    title: 'Welcome',
+    title: 'Viper',
   };
   render() {
     return (
@@ -19,6 +19,11 @@ export default class HomeScreen extends React.Component {
           </Body>
           <Right />
         </Header>
+        <Content padder>
+          <Text>
+            This is Content Section
+          </Text>
+        </Content>
       </Container>
     );
   }
