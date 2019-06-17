@@ -3,6 +3,7 @@ import LoginScreen from './src/screens/login-screen';
 import AuthLoadingScreen from './src/screens/auth-loading-screen';
 import * as React from 'react';
 import {HomeNavigator} from './src/navigation/home-navigator';
+import {Root} from 'native-base';
 
 // Implementation of HomeScreen, OtherScreen, SignInScreen, AuthLoadingScreen
 // goes here.
@@ -24,6 +25,8 @@ const AppContainer = createAppContainer(createSwitchNavigator(
 export default class App extends React.Component {
   render() {
     /* In the root component we are rendering the app navigator */
-    return <AppContainer/>;
+    return   <Root>
+      <AppContainer />
+    </Root>;
   }
 }

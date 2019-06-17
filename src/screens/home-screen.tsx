@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Body, Button, Container, Content, Drawer, Header, Icon, Left, List, Spinner, Title} from 'native-base';
+import {ActionSheet, Body, Button, Container, Content, Drawer, Header, Icon, Left, List, Right, Spinner, Title, Toast} from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import {QueueItem} from '../api/model/queueItem';
 import {QueueItemComponent} from '../components/queue-item';
@@ -11,6 +11,9 @@ interface State {
   loading: boolean;
   queueData: QueueItem[];
 }
+
+var BUTTONS = ["Restart Failed", "Delete Finished", "Refresh", "Cancel"];
+var CANCEL_INDEX = 3;
 
 export default class HomeScreen extends React.Component<{}, State> {
   drawer: any;
@@ -28,28 +31,37 @@ export default class HomeScreen extends React.Component<{}, State> {
   componentDidMount() {
     AsyncStorage.getItem("serverURL").then(url => {
       AsyncStorage.getItem("sessionId").then(sessionId => {
-        let formData = new FormData();
-        // @ts-ignore
-        formData.append("session", JSON.parse(sessionId));
-        fetch(url + "/api/getQueue",
-          {
-            method: 'POST',
-            body: formData
-          }
-        )
-          .then(response => response.json())
-          .then((responseJson) => {
-            this.setState({
-              loading: false,
-              url: url,
-              queueData: responseJson,
-              sessionId: sessionId
-            })
-          })
-          .catch(error => console.log(error)) //to catch the errors if any
+        this.loadQueue(JSON.parse(sessionId ? sessionId: ""), url)
       })
     });
   }
+
+  loadQueue = async (sessionId: string | null, url: string | null) => {
+    this.setState({loading: true});
+    let formData = new FormData();
+    // @ts-ignore
+    formData.append("session", sessionId);
+    fetch(url + "/api/getQueue",
+      {
+        method: 'POST',
+        body: formData
+      }
+    )
+      .then(response => response.json())
+      .then((responseJson) => {
+        console.log(responseJson);
+        this.setState({
+          loading: false,
+          url: url,
+          queueData: responseJson,
+          sessionId: sessionId
+        })
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({loading: false});
+      })
+  };
 
   closeDrawer = () => {
     this.drawer._root.close()
@@ -57,6 +69,54 @@ export default class HomeScreen extends React.Component<{}, State> {
 
   openDrawer = () => {
     this.drawer._root.open()
+  };
+
+  restartFailed = () => {
+    let formData = new FormData();
+    // @ts-ignore
+    formData.append("session", this.state.sessionId);
+    fetch(this.state.url + "/api/restartFailed",
+      {
+        method: 'POST',
+        body: formData
+      }
+    )
+      .then(response => response.text())
+      .then((response) => {
+        if (response) {
+          Toast.show({
+            text: "Restart Failed Successful",
+            buttonText: "Okay",
+            duration: 3000
+          });
+          this.loadQueue(this.state.sessionId, this.state.url);
+        }
+      })
+      .catch(error => console.log(error))
+  };
+
+  deleteFinished = () => {
+    let formData = new FormData();
+    // @ts-ignore
+    formData.append("session", this.state.sessionId);
+    fetch(this.state.url + "/api/deleteFinished",
+      {
+        method: 'POST',
+        body: formData
+      }
+    )
+      .then(response => response.text())
+      .then((response) => {
+        if (response) {
+          Toast.show({
+            text: "Successfully deleted finished downloads",
+            buttonText: "Okay",
+            duration: 3000
+          });
+        }
+        this.loadQueue(this.state.sessionId, this.state.url);
+      })
+      .catch(error => console.log(error))
   };
 
   render() {
@@ -82,6 +142,31 @@ export default class HomeScreen extends React.Component<{}, State> {
             <Body>
               <Title>Overview</Title>
             </Body>
+            <Right>
+              <Button transparent onPress={() =>
+                ActionSheet.show(
+                  {
+                    options: BUTTONS,
+                    cancelButtonIndex: CANCEL_INDEX,
+                    title: "Queue Actions"
+                  },
+                  buttonIndex => {
+                    switch (buttonIndex) {
+                      case 0:
+                        this.restartFailed();
+                        break;
+                      case 1:
+                        this.deleteFinished();
+                        break;
+                      case 2:
+                        this.loadQueue(this.state.sessionId, this.state.url);
+                        break;
+                    }
+                  }
+                )}>
+                <Icon name='more'/>
+              </Button>
+            </Right>
           </Header>
           {this.state.loading &&
           <Content>
@@ -96,12 +181,5 @@ export default class HomeScreen extends React.Component<{}, State> {
         </Container>
       </Drawer>
     );
-  }
-
-  _navigateToDetails = (pid: string) => {
-    // @ts-ignore
-    this.props.navigation.navigate("Details", {
-      pid: pid
-    })
   }
 }
