@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Body, Button, Container, Content, Header, Icon, Left, List, Right, Spinner, Title} from 'native-base';
 import {AsyncStorage} from 'react-native';
 import {QueueItem} from '../api/model/queueItem';
-import {QueueItemComponent} from '../components/queueitem.component';
+import {QueueItemComponent} from '../components/queue-item';
 
 interface State {
   url: string | null;
@@ -78,10 +78,17 @@ export default class HomeScreen extends React.Component<{}, State> {
         }
         <Content padder>
           <List>
-            {this.state.queueData.map((value, index) => <QueueItemComponent key={index} item={value} navigation={navigation}/>)}
+            {this.state.queueData.map((item) => <QueueItemComponent item={item} navigation={navigation} key={item.pid}/>)}
           </List>
         </Content>
       </Container>
     );
+  }
+
+  _navigateToDetails = (pid: string) => {
+    // @ts-ignore
+    this.props.navigation.navigate("Details", {
+      pid: pid
+    })
   }
 }

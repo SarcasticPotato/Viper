@@ -1,21 +1,18 @@
 import * as React from 'react';
 import {Container, Content, Header, Text} from 'native-base';
-import {QueueItem} from '../api/model/queueItem';
 
-interface Props {
-  pid: string;
-}
-
-export default class DetailScreen extends React.Component<Props> {
+export default class DetailScreen extends React.Component<{}> {
 
   render() {
-    const pid = this.props.pid;
+    // @ts-ignore
+    const { params } = this.props.navigation.state;
+    const pid = params ? params.pid: null;
     return (
       <Container>
         <Header/>
         <Content>
           <Text>
-            {this.props.pid}
+            {pid}
           </Text>
         </Content>
       </Container>

@@ -20,9 +20,6 @@ export default class LoginScreen extends React.Component<{}, State> {
   };
 
   render() {
-    // @ts-ignore
-    const {navigate} = this.props.navigation;
-
     const handleUrlChange = (url: string) => {
       this.setState({url: url});
     };

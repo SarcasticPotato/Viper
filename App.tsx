@@ -3,11 +3,13 @@ import HomeScreen from './src/screens/home-screen';
 import LoginScreen from './src/screens/login-screen';
 import AuthLoadingScreen from './src/screens/auth-loading-screen';
 import * as React from 'react';
+import DetailScreen from './src/screens/detail-screen';
+import {HomeNavigator} from './src/navigation/home-navigator';
 
 // Implementation of HomeScreen, OtherScreen, SignInScreen, AuthLoadingScreen
 // goes here.
 
-const AppStack = createStackNavigator({Home: HomeScreen});
+const AppStack = HomeNavigator;
 const AuthStack = createStackNavigator({SignIn: LoginScreen});
 
 const AppContainer = createAppContainer(createSwitchNavigator(

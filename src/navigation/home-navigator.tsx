@@ -1,15 +1,12 @@
 import React from 'react';
-import {createBottomTabNavigator} from 'react-navigation';
+import {createStackNavigator} from 'react-navigation';
 import HomeScreen from '../screens/home-screen';
 import DetailScreen from '../screens/detail-screen';
 
-export const SignedIn = createBottomTabNavigator(
+export const HomeNavigator = createStackNavigator(
   {
     Home: {
-      screen: HomeScreen,
-      navigationOptions: {
-        tabBarLabel: "Home"
-      },
+      screen: HomeScreen
     },
     Details: {
       screen: DetailScreen

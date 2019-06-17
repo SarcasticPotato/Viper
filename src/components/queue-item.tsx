@@ -14,14 +14,10 @@ export class QueueItemComponent extends React.Component<Props> {
   }
 
   goToDetailPage = () => {
-    console.log("navigate to detail page");
-    // @ts-ignore
     this.props.navigation.navigate('Details', {pid: this.props.item.pid});
   };
 
   render() {
-
-    // @ts-ignore
     let item: QueueItem = this.props.item;
 
     return (
