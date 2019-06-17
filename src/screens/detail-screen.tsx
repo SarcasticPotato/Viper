@@ -1,6 +1,22 @@
 import * as React from 'react';
-import {Container, Content, Header, List, ListItem, ScrollableTab, Spinner, Tab, Tabs, Text} from 'native-base';
-import {AsyncStorage} from 'react-native';
+import {
+  Body,
+  Button,
+  Container,
+  Content,
+  Header,
+  Icon,
+  Left,
+  List,
+  ListItem,
+  ScrollableTab,
+  Spinner,
+  Tab,
+  Tabs,
+  Text,
+  Title
+} from 'native-base';
+import AsyncStorage from '@react-native-community/async-storage';
 import {Package} from '../api/model/package';
 
 interface State {
@@ -55,19 +71,31 @@ export default class DetailScreen extends React.Component<{}, State> {
   }
 
   render() {
-    if(this.state.loading) {
+    // @ts-ignore
+    const navigation = this.props.navigation;
+
+    if (this.state.loading) {
       return (
         <Container>
-          <Header />
+          <Header/>
           <Content>
-              <Spinner/>
+            <Spinner/>
           </Content>
         </Container>
       );
     }
     return (
       <Container>
-        <Header hasTabs/>
+        <Header hasTabs>
+          <Left>
+            <Button transparent>
+              <Icon name='arrow-back' onPress={() => navigation.goBack()}/>
+            </Button>
+          </Left>
+          <Body>
+            <Title>Details</Title>
+          </Body>
+        </Header>
         <Tabs renderTabBar={() => <ScrollableTab/>}>
           <Tab heading="Information">
             <Content>
@@ -86,7 +114,7 @@ export default class DetailScreen extends React.Component<{}, State> {
             <Content>
               <List>
                 {this.state.package.links.map((link) => {
-                  return <ListItem>
+                  return <ListItem key={link.fid}>
                     <Text>{link.url}</Text>
                   </ListItem>
                 })}

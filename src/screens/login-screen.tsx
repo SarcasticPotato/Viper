@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Button, Container, Content, Form, Header, Input, Item, Text} from 'native-base';
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 
 interface State {
   url: string;

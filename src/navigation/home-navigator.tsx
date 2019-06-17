@@ -1,9 +1,9 @@
 import React from 'react';
-import {createStackNavigator} from 'react-navigation';
+import {createDrawerNavigator} from 'react-navigation';
 import HomeScreen from '../screens/home-screen';
 import DetailScreen from '../screens/detail-screen';
 
-export const HomeNavigator = createStackNavigator(
+export const HomeNavigator = createDrawerNavigator(
   {
     Home: {
       screen: HomeScreen

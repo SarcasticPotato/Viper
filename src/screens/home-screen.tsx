@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Body, Button, Container, Content, Header, Icon, Left, List, Right, Spinner, Title} from 'native-base';
-import {AsyncStorage} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import {QueueItem} from '../api/model/queueItem';
 import {QueueItemComponent} from '../components/queue-item';
 
@@ -12,10 +12,6 @@ interface State {
 }
 
 export default class HomeScreen extends React.Component<{}, State> {
-  static navigationOptions = {
-    title: 'Viper',
-  };
-
   constructor(props: Object) {
     super(props);
     this.state = {
@@ -60,15 +56,9 @@ export default class HomeScreen extends React.Component<{}, State> {
     return (
       <Container>
         <Header>
-          <Left>
-            <Button transparent>
-              <Icon name='menu'/>
-            </Button>
-          </Left>
           <Body>
-            <Title>Header</Title>
+            <Title>Overview</Title>
           </Body>
-          <Right/>
         </Header>
         {this.state.loading &&
         <Content>
