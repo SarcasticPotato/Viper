@@ -70,7 +70,8 @@ export default class LoginScreen extends React.Component<{}, State> {
     let sessionId = await response.text();
     console.log(sessionId);
     if (sessionId) {
-      // await AsyncStorage.setItem('sessionId', sessionId);
+      await AsyncStorage.setItem('sessionId', sessionId);
+      await AsyncStorage.setItem('serverURL', this.state.url);
       // @ts-ignore
       this.props.navigation.navigate('App');
     }
