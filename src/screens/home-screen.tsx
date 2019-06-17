@@ -1,8 +1,9 @@
 import * as React from 'react';
-import {Body, Button, Container, Content, Header, Icon, Left, List, Right, Spinner, Title} from 'native-base';
+import {Body, Button, Container, Content, Drawer, Header, Icon, Left, List, Spinner, Title} from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import {QueueItem} from '../api/model/queueItem';
 import {QueueItemComponent} from '../components/queue-item';
+import SideBar from '../components/side-bar';
 
 interface State {
   url: string | null;
@@ -12,6 +13,8 @@ interface State {
 }
 
 export default class HomeScreen extends React.Component<{}, State> {
+  drawer: any;
+
   constructor(props: Object) {
     super(props);
     this.state = {
@@ -48,29 +51,50 @@ export default class HomeScreen extends React.Component<{}, State> {
     });
   }
 
-  render() {
+  closeDrawer = () => {
+    this.drawer._root.close()
+  };
 
+  openDrawer = () => {
+    this.drawer._root.open()
+  };
+
+  render() {
     // @ts-ignore
-    let navigation = this.props.navigation;
+    const navigation = this.props.navigation;
 
     return (
-      <Container>
-        <Header>
-          <Body>
-            <Title>Overview</Title>
-          </Body>
-        </Header>
-        {this.state.loading &&
-        <Content>
-            <Spinner/>
-        </Content>
-        }
-        <Content padder>
-          <List>
-            {this.state.queueData.map((item) => <QueueItemComponent item={item} navigation={navigation} key={item.pid}/>)}
-          </List>
-        </Content>
-      </Container>
+      <Drawer
+        ref={(ref) => {
+          this.drawer = ref
+        }}
+        content={<SideBar navigation={navigation}/>}
+        onClose={() => this.closeDrawer()}>
+        <Container>
+          <Header>
+            <Left>
+              <Button
+                transparent
+                onPress={() => this.openDrawer()}>
+                <Icon name="menu"/>
+              </Button>
+            </Left>
+            <Body>
+              <Title>Overview</Title>
+            </Body>
+          </Header>
+          {this.state.loading &&
+          <Content>
+              <Spinner/>
+          </Content>
+          }
+          <Content padder>
+            <List>
+              {this.state.queueData.map((item) => <QueueItemComponent item={item} navigation={navigation} key={item.pid}/>)}
+            </List>
+          </Content>
+        </Container>
+      </Drawer>
     );
   }
 
