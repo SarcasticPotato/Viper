@@ -40,7 +40,6 @@ export default class HomeScreen extends React.Component<{}, State> {
         )
           .then(response => response.json())
           .then((responseJson) => {
-            console.log(responseJson);
             this.setState({
               loading: false,
               url: url,

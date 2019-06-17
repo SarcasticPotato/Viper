@@ -21,9 +21,7 @@ export default class AuthLoadingScreen extends React.Component {
       },
       body: formData
     });
-    console.log(userDetails);
     const isLoggedIn = sessionId && url && userDetails.status >= 200 && userDetails.status < 300;
-    console.log(isLoggedIn);
 
     // This will switch to the App screen or Auth screen and this loading
     // screen will be unmounted and thrown away.
