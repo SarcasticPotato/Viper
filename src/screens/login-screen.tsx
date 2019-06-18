@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Button, Container, Content, Form, Header, Input, Item, Text} from 'native-base';
+import {Button, Container, Content, Form, Header, Input, Item, Text, Toast} from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 
 interface State {
@@ -44,9 +44,9 @@ export default class LoginScreen extends React.Component<{}, State> {
               <Input placeholder="Username" value={this.state.username} onChangeText={handleUsernameChange}/>
             </Item>
             <Item last>
-              <Input placeholder="Password" value={this.state.password} onChangeText={handlePasswordChange}/>
+              <Input secureTextEntry placeholder="Password" value={this.state.password} onChangeText={handlePasswordChange}/>
             </Item>
-            <Button block onPress={this._signInAsync}>
+            <Button full success onPress={this._signInAsync}>
               <Text>Login</Text>
             </Button>
           </Form>
@@ -55,20 +55,37 @@ export default class LoginScreen extends React.Component<{}, State> {
     );
   }
 
+  showLoginErrorToast = () => {
+    Toast.show({
+      text: "Login Failed!",
+      buttonText: "Okay",
+      duration: 3000
+    });
+  };
+
   _signInAsync = async () => {
     let formdata = new FormData();
     formdata.append("username", this.state.username);
     formdata.append("password", this.state.password);
-    let response = await fetch(this.state.url + "/api/login", {
+    fetch(this.state.url + "/api/login", {
       method: 'POST',
       body: formdata,
-    });
-    let sessionId = await response.text();
-    if (sessionId) {
-      await AsyncStorage.setItem('sessionId', sessionId);
-      await AsyncStorage.setItem('serverURL', this.state.url);
-      // @ts-ignore
-      this.props.navigation.navigate('App');
-    }
+    }).then(response => response.text())
+      .catch((err) => {
+        this.showLoginErrorToast();
+      })
+      .then(sessionId => {
+        if (sessionId) {
+          AsyncStorage.setItem('sessionId', sessionId).then(() => {
+            AsyncStorage.setItem('serverURL', this.state.url).then(() => {
+              // @ts-ignore
+              this.props.navigation.navigate('App');
+            });
+          })
+        } else {
+          this.showLoginErrorToast();
+        }
+      })
+
   };
 }
