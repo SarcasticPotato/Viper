@@ -8,29 +8,28 @@ export default class AuthLoadingScreen extends React.Component {
     this._bootstrapAsync();
   }
 
-  // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async () => {
     let sessionId = await AsyncStorage.getItem("sessionId");
     let url = await AsyncStorage.getItem("serverURL");
     let formData = new FormData();
     // @ts-ignore
     formData.append("session", JSON.parse(sessionId));
-    let userDetails = await fetch(url + "/api/getAllUserData",{
+    fetch(url + "/api/getAllUserData", {
       method: 'POST',
       headers: {
         'Content-Type': 'multipart/form-data'
       },
       body: formData
-    });
-    const isLoggedIn = sessionId && url && userDetails.status >= 200 && userDetails.status < 300;
-
-    // This will switch to the App screen or Auth screen and this loading
-    // screen will be unmounted and thrown away.
-    // @ts-ignore
-    this.props.navigation.navigate(isLoggedIn ? 'App' : 'Auth');
+    }).then(res => {
+      const isLoggedIn = sessionId && url && res.status >= 200 && res.status < 300;
+      // @ts-ignore
+      this.props.navigation.navigate(isLoggedIn ? 'App' : 'Auth');
+    }).catch((err) => {
+      // @ts-ignore
+      this.props.navigation.navigate('Auth');
+    })
   };
 
-  // Render any loading content that you like here
   render() {
     return (
       <View>

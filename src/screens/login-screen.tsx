@@ -56,7 +56,6 @@ export default class LoginScreen extends React.Component<{}, State> {
   }
 
   _signInAsync = async () => {
-    // await AsyncStorage.setItem('userToken', 'abc');
     let formdata = new FormData();
     formdata.append("username", this.state.username);
     formdata.append("password", this.state.password);
@@ -65,7 +64,6 @@ export default class LoginScreen extends React.Component<{}, State> {
       body: formdata,
     });
     let sessionId = await response.text();
-    console.log(sessionId);
     if (sessionId) {
       await AsyncStorage.setItem('sessionId', sessionId);
       await AsyncStorage.setItem('serverURL', this.state.url);

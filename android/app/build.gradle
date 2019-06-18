@@ -93,6 +93,22 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = false
 
+allprojects {
+    afterEvaluate { project ->
+        def propsFile = rootProject.file('keysotres/keystore.properties')
+        def configName = 'release'
+
+        if (propsFile.exists() && android.signingConfigs.hasProperty(configName)) {
+            def props = new Properties()
+            props.load(new FileInputStream(propsFile))
+            android.signingConfigs[configName].storeFile = file(props['key.store.name'])
+            android.signingConfigs[configName].storePassword = props['key.store.password']
+            android.signingConfigs[configName].keyAlias = props['key.alias.name']
+            android.signingConfigs[configName].keyPassword = props['key.alias.password']
+        }
+    }
+}
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
@@ -108,6 +124,29 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            def propsFile = rootProject.file('keystores/keystore.properties')
+            def configName = 'release'
+
+            if (propsFile.exists() && android.signingConfigs.hasProperty(configName)) {
+                def props = new Properties()
+                props.load(new FileInputStream(propsFile))
+                storeFile file(props['key.store.name'])
+                storePassword props['key.store.password']
+                keyAlias props['key.alias.name']
+                keyPassword props['key.alias.password']
+            }
+//            if (project.hasProperty('storeFile')) {
+//                storeFile file(storeFile)
+//                storePassword storePassword
+//                keyAlias keyAlias
+//                keyPassword keyPassword
+//            }
+        }
+    }
+
     splits {
         abi {
             reset()
@@ -120,6 +159,7 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
     }
     // applicationVariants are e.g. debug, release
