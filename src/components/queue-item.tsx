@@ -22,7 +22,7 @@ export class QueueItemComponent extends React.Component<Props> {
 
     return (
       <ListItem button onPress={(_) => this.goToDetailPage()}>
-        <Text>{item.name}</Text>
+        <Text>{item.name} ({item.linksdone/item.linkstotal*100}%)</Text>
       </ListItem>
     );
   }

@@ -34,7 +34,6 @@ export default class LoginScreen extends React.Component<{}, State> {
 
     return (
       <Container>
-        <Header/>
         <Content>
           <Form>
             <Item>

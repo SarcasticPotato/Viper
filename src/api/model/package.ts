@@ -2,7 +2,7 @@ export interface Package {
   pid?: number;
   name?: string;
   folder?: string;
-  links: Link[]
+  links: Link[];
 }
 
 interface Link {
@@ -16,4 +16,5 @@ interface Link {
   url: string;
   packageID: number;
   order: number;
+  name: string;
 }

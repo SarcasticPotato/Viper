@@ -1,14 +1,14 @@
 import * as React from 'react';
 import {
   Body,
-  Button,
+  Button, Col,
   Container,
-  Content,
+  Content, Grid, H3,
   Header,
   Icon,
   Left,
   List,
-  ListItem,
+  ListItem, Row,
   ScrollableTab,
   Spinner,
   Tab,
@@ -58,6 +58,7 @@ export default class DetailScreen extends React.Component<{}, State> {
         )
           .then(response => response.json())
           .then((responseJson) => {
+            console.log(responseJson);
             this.setState({
               loading: false,
               url: url,
@@ -98,16 +99,58 @@ export default class DetailScreen extends React.Component<{}, State> {
         </Header>
         <Tabs renderTabBar={() => <ScrollableTab/>}>
           <Tab heading="Information">
-            <Content>
-              <Text>
-                {this.state.package.name}
-              </Text>
-              <Text>
-                {this.state.package.folder}
-              </Text>
-              <Text>
-                {this.state.package.pid}
-              </Text>
+            <Content padder>
+              <Grid>
+                <Row>
+                  <Col>
+                    <H3>
+                      Name
+                    </H3>
+                  </Col>
+                  <Col>
+                    <Text>
+                      {this.state.package.name}
+                    </Text>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <H3>
+                      Folder
+                    </H3>
+                  </Col>
+                  <Col>
+                    <Text>
+                      {this.state.package.folder}
+                    </Text>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <H3>
+                      ID
+                    </H3>
+                  </Col>
+                  <Col>
+                    <Text>
+                      {this.state.package.pid}
+                    </Text>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col>
+                    <H3>
+                      Links
+                    </H3>
+                  </Col>
+                  <Col>
+                    <Text>
+                      {this.state.package.links.filter(link => link.status == 0).length}/{this.state.package.links.length}
+                    </Text>
+                  </Col>
+                </Row>
+              </Grid>
             </Content>
           </Tab>
           <Tab heading="Links">
@@ -115,7 +158,7 @@ export default class DetailScreen extends React.Component<{}, State> {
               <List>
                 {this.state.package.links.map((link) => {
                   return <ListItem key={link.fid}>
-                    <Text>{link.url}</Text>
+                    <Text>{link.name}</Text>
                   </ListItem>
                 })}
               </List>
