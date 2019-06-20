@@ -306,7 +306,7 @@ export default class DetailScreen extends React.Component<{}, State> {
                     </CardItem>
                     <CardItem bordered>
                       <Body>
-                        <Text>{link.statusmsg}</Text>
+                        <Text>Status: {link.statusmsg}</Text>
                       </Body>
                     </CardItem>
                     <CardItem footer bordered>

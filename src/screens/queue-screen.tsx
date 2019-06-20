@@ -1,24 +1,23 @@
 import * as React from 'react';
-import {Body, Button, Container, Content, Drawer, Header, Icon, Left, List, ListItem, Spinner, Title, Toast, Text} from 'native-base';
+import {ActionSheet, Body, Button, Container, Content, Drawer, Header, Icon, Left, List, Right, Spinner, Title, Toast} from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import {QueueItem} from '../api/model/queueItem';
+import {QueueItemComponent} from '../components/queue-item';
 import SideBar from '../components/side-bar';
 import {RefreshControl} from 'react-native';
-import {File} from '../api/model/file';
 
 interface State {
   url: string | null;
   sessionId: string | null;
   loading: boolean;
   queueData: QueueItem[];
-  downloads: File[];
   refreshing: boolean;
 }
 
 var BUTTONS = ["Restart Failed", "Delete Finished", "Refresh", "Cancel"];
 var CANCEL_INDEX = 3;
 
-export default class HomeScreen extends React.Component<{}, State> {
+export default class QueueScreen extends React.Component<{}, State> {
   drawer: any;
 
   constructor(props: Object) {
@@ -28,7 +27,6 @@ export default class HomeScreen extends React.Component<{}, State> {
       sessionId: null,
       loading: true,
       queueData: [],
-      downloads: [],
       refreshing: false
     }
   }
@@ -36,33 +34,10 @@ export default class HomeScreen extends React.Component<{}, State> {
   componentDidMount() {
     AsyncStorage.getItem("serverURL").then(url => {
       AsyncStorage.getItem("sessionId").then(sessionId => {
-        this.loadQueue(JSON.parse(sessionId ? sessionId : ""), url);
-        this.getDownloadStatus(JSON.parse(sessionId ? sessionId : ""), (url ? url : ""));
+        this.loadQueue(JSON.parse(sessionId ? sessionId : ""), url)
       })
     });
   }
-
-  getDownloadStatus = async (sessionId: string, url: string) => {
-    let formData = new FormData();
-    // @ts-ignore
-    formData.append("session", sessionId);
-    fetch(url + "/api/statusDownloads",
-      {
-        method: 'POST',
-        body: formData
-      }
-    )
-      .then(response => response.json())
-      .then((responseJson) => {
-        console.log(responseJson);
-        this.setState({
-          loading: false,
-          url: url,
-          downloads: responseJson,
-          sessionId: sessionId
-        })
-      })
-  };
 
   loadQueue = async (sessionId: string | null, url: string | null) => {
     this.setState({loading: true});
@@ -77,6 +52,7 @@ export default class HomeScreen extends React.Component<{}, State> {
     )
       .then(response => response.json())
       .then((responseJson) => {
+        console.log(responseJson);
         this.setState({
           loading: false,
           url: url,
@@ -172,8 +148,33 @@ export default class HomeScreen extends React.Component<{}, State> {
               </Button>
             </Left>
             <Body>
-              <Title>Overview</Title>
+              <Title>Queue</Title>
             </Body>
+            <Right>
+              <Button transparent onPress={() =>
+                ActionSheet.show(
+                  {
+                    options: BUTTONS,
+                    cancelButtonIndex: CANCEL_INDEX,
+                    title: "Queue Actions"
+                  },
+                  buttonIndex => {
+                    switch (buttonIndex) {
+                      case 0:
+                        this.restartFailed();
+                        break;
+                      case 1:
+                        this.deleteFinished();
+                        break;
+                      case 2:
+                        this.loadQueue(this.state.sessionId, this.state.url);
+                        break;
+                    }
+                  }
+                )}>
+                <Icon name='more'/>
+              </Button>
+            </Right>
           </Header>
           {this.state.loading &&
           <Content>
@@ -182,7 +183,7 @@ export default class HomeScreen extends React.Component<{}, State> {
           }
           <Content padder refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this._onRefresh()}/>}>
             <List>
-              {this.state.downloads.map((file) => <ListItem><Text>{file.name}</Text></ListItem>)}
+              {this.state.queueData.map((item) => <QueueItemComponent item={item} navigation={navigation} key={item.pid}/>)}
             </List>
           </Content>
         </Container>

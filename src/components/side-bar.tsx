@@ -2,7 +2,7 @@ import React from "react";
 import {Button, Container, Content, Footer, FooterTab, Icon, List, ListItem, Text} from "native-base";
 import AsyncStorage from '@react-native-community/async-storage';
 
-const routes = ["Home"];
+const routes = ["Home", "Queue"];
 
 export default class SideBar extends React.Component<{ navigation: any }> {
   render() {
