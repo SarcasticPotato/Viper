@@ -2,24 +2,30 @@ import * as React from 'react';
 import {
   ActionSheet,
   Body,
-  Button, Col,
+  Button,
+  Card,
+  CardItem,
+  Col,
   Container,
-  Content, Grid, H3,
+  Content,
+  Grid,
+  H3,
   Header,
   Icon,
   Left,
   List,
-  ListItem, Right, Row,
+  Right,
+  Row,
   ScrollableTab,
   Spinner,
   Tab,
   Tabs,
   Text,
-  Title, Toast
+  Title,
+  Toast
 } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Package} from '../api/model/package';
-import {NavigationEvents} from "react-navigation";
 
 var BUTTONS = ["Restart Package", "Delete Package", "Refresh", "Cancel"];
 var CANCEL_INDEX = 3;
@@ -52,7 +58,7 @@ export default class DetailScreen extends React.Component<{}, State> {
     const pid = params ? params.pid : 0;
     AsyncStorage.getItem("serverURL").then(url => {
       AsyncStorage.getItem("sessionId").then(sessionId => {
-       this.loadDetails(JSON.parse(sessionId? sessionId : ""), url, pid)
+        this.loadDetails(JSON.parse(sessionId ? sessionId : ""), url, pid)
       })
     });
   }
@@ -87,7 +93,7 @@ export default class DetailScreen extends React.Component<{}, State> {
   restartPackage = async (pid: number) => {
     let formData = new FormData();
     formData.append("session", this.state.sessionId);
-    fetch(this.state.url + "/api/restartPackage/"+pid,
+    fetch(this.state.url + "/api/restartPackage/" + pid,
       {
         method: 'POST',
         body: formData
@@ -112,7 +118,7 @@ export default class DetailScreen extends React.Component<{}, State> {
     const navigation = this.props.navigation;
     let formData = new FormData();
     formData.append("session", this.state.sessionId);
-    fetch(this.state.url + "/api/deletePackages/["+pid + "]",
+    fetch(this.state.url + "/api/deletePackages/[" + pid + "]",
       {
         method: 'POST',
         body: formData
@@ -247,9 +253,39 @@ export default class DetailScreen extends React.Component<{}, State> {
             <Content>
               <List>
                 {this.state.package.links.map((link) => {
-                  return <ListItem key={link.fid}>
-                    <Text>{link.name}</Text>
-                  </ListItem>
+                  return <Card key={link.fid}>
+                    <CardItem header bordered>
+                      <Text>{link.name}</Text>
+                    </CardItem>
+                    <CardItem bordered>
+                      <Body>
+                        <Text>{link.statusmsg}</Text>
+                      </Body>
+                    </CardItem>
+                    <CardItem footer bordered>
+                      <Button transparent>
+                        <Icon active name="refresh" />
+                        <Text>Restart</Text>
+                      </Button>
+
+                      <Button transparent danger>
+                        <Icon active name="close" />
+                        <Text>Delete</Text>
+                      </Button>
+                    </CardItem>
+                  </Card>
+
+                  // return <ListItem key={link.fid}>
+                  //   <Body>
+                  //     <Text>{link.name}</Text>
+                  //     <Text>{link.statusmsg}</Text>
+                  //   </Body>
+                  //   <Right>
+                  //     <Button rounded small>
+                  //       <Icon active name="refresh"/>
+                  //     </Button>
+                  //   </Right>
+                  // </ListItem>
                 })}
               </List>
             </Content>
