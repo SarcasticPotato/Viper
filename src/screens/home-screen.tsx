@@ -4,13 +4,14 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {QueueItem} from '../api/model/queueItem';
 import {QueueItemComponent} from '../components/queue-item';
 import SideBar from '../components/side-bar';
-import {NavigationEvents} from 'react-navigation';
+import {RefreshControl} from 'react-native';
 
 interface State {
   url: string | null;
   sessionId: string | null;
   loading: boolean;
   queueData: QueueItem[];
+  refreshing: boolean;
 }
 
 var BUTTONS = ["Restart Failed", "Delete Finished", "Refresh", "Cancel"];
@@ -25,14 +26,15 @@ export default class HomeScreen extends React.Component<{}, State> {
       url: null,
       sessionId: null,
       loading: true,
-      queueData: []
+      queueData: [],
+      refreshing: false
     }
   }
 
   componentDidMount() {
     AsyncStorage.getItem("serverURL").then(url => {
       AsyncStorage.getItem("sessionId").then(sessionId => {
-        this.loadQueue(JSON.parse(sessionId ? sessionId: ""), url)
+        this.loadQueue(JSON.parse(sessionId ? sessionId : ""), url)
       })
     });
   }
@@ -120,6 +122,11 @@ export default class HomeScreen extends React.Component<{}, State> {
       .catch(error => console.log(error))
   };
 
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    this.loadQueue(this.state.sessionId, this.state.url).then(() => this.setState({refreshing: false}));
+  };
+
   render() {
     // @ts-ignore
     const navigation = this.props.navigation;
@@ -174,7 +181,7 @@ export default class HomeScreen extends React.Component<{}, State> {
               <Spinner/>
           </Content>
           }
-          <Content padder>
+          <Content padder refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this._onRefresh()}/>}>
             <List>
               {this.state.queueData.map((item) => <QueueItemComponent item={item} navigation={navigation} key={item.pid}/>)}
             </List>
