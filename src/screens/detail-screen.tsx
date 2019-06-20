@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  ActionSheet,
   Body,
   Button, Col,
   Container,
@@ -8,16 +9,20 @@ import {
   Icon,
   Left,
   List,
-  ListItem, Row,
+  ListItem, Right, Row,
   ScrollableTab,
   Spinner,
   Tab,
   Tabs,
   Text,
-  Title
+  Title, Toast
 } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Package} from '../api/model/package';
+import {NavigationEvents} from "react-navigation";
+
+var BUTTONS = ["Restart Package", "Delete Package", "Refresh", "Cancel"];
+var CANCEL_INDEX = 3;
 
 interface State {
   url: string | null;
@@ -47,33 +52,92 @@ export default class DetailScreen extends React.Component<{}, State> {
     const pid = params ? params.pid : 0;
     AsyncStorage.getItem("serverURL").then(url => {
       AsyncStorage.getItem("sessionId").then(sessionId => {
-        let formData = new FormData();
-        // @ts-ignore
-        formData.append("session", JSON.parse(sessionId));
-        fetch(url + "/api/getPackageData/" + pid,
-          {
-            method: 'POST',
-            body: formData
-          }
-        )
-          .then(response => response.json())
-          .then((responseJson) => {
-            console.log(responseJson);
-            this.setState({
-              loading: false,
-              url: url,
-              sessionId: sessionId,
-              package: responseJson
-            })
-          })
-          .catch(error => console.log(error)) //to catch the errors if any
+       this.loadDetails(JSON.parse(sessionId? sessionId : ""), url, pid)
       })
     });
   }
 
+  loadDetails = async (sessionId: string | null, url: string | null, pid: number) => {
+    this.setState({loading: true});
+    let formData = new FormData();
+    // @ts-ignore
+    formData.append("session", sessionId);
+    fetch(url + "/api/getPackageData/" + pid,
+      {
+        method: 'POST',
+        body: formData
+      }
+    )
+      .then(response => response.json())
+      .then((responseJson) => {
+        console.log(responseJson);
+        this.setState({
+          loading: false,
+          url: url,
+          sessionId: sessionId,
+          package: responseJson
+        })
+      })
+      .catch(error => {
+        console.log(error);
+        this.setState({loading: false});
+      })
+  };
+
+  restartPackage = async (pid: number) => {
+    let formData = new FormData();
+    formData.append("session", this.state.sessionId);
+    fetch(this.state.url + "/api/restartPackage/"+pid,
+      {
+        method: 'POST',
+        body: formData
+      }
+    )
+      .then(response => response.text())
+      .then((response) => {
+        if (response) {
+          Toast.show({
+            text: "Successfully restarted package",
+            buttonText: "Okay",
+            duration: 3000
+          });
+        }
+        this.loadDetails(this.state.sessionId, this.state.url, pid);
+      })
+      .catch(error => console.log(error))
+  };
+
+  deletePackage = async (pid: number) => {
+    // @ts-ignore
+    const navigation = this.props.navigation;
+    let formData = new FormData();
+    formData.append("session", this.state.sessionId);
+    fetch(this.state.url + "/api/deletePackages/["+pid + "]",
+      {
+        method: 'POST',
+        body: formData
+      }
+    )
+      .then(response => response.text())
+      .then((response) => {
+        if (response) {
+          Toast.show({
+            text: "Successfully removed package",
+            buttonText: "Okay",
+            duration: 3000
+          });
+        }
+        navigation.goBack();
+      })
+      .catch(error => console.log(error))
+  };
+
   render() {
     // @ts-ignore
     const navigation = this.props.navigation;
+    // @ts-ignore
+    const {params} = this.props.navigation.state;
+    const pid = params ? params.pid : 0;
 
     if (this.state.loading) {
       return (
@@ -96,6 +160,32 @@ export default class DetailScreen extends React.Component<{}, State> {
           <Body>
             <Title>Details</Title>
           </Body>
+
+          <Right>
+            <Button transparent onPress={() =>
+              ActionSheet.show(
+                {
+                  options: BUTTONS,
+                  cancelButtonIndex: CANCEL_INDEX,
+                  title: "Queue Actions"
+                },
+                buttonIndex => {
+                  switch (buttonIndex) {
+                    case 0:
+                      this.restartPackage(pid);
+                      break;
+                    case 1:
+                      this.deletePackage(pid);
+                      break;
+                    case 2:
+                      this.loadDetails(this.state.sessionId, this.state.url, pid);
+                      break;
+                  }
+                }
+              )}>
+              <Icon name='more'/>
+            </Button>
+          </Right>
         </Header>
         <Tabs renderTabBar={() => <ScrollableTab/>}>
           <Tab heading="Information">

@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {QueueItem} from '../api/model/queueItem';
 import {QueueItemComponent} from '../components/queue-item';
 import SideBar from '../components/side-bar';
+import {NavigationEvents} from 'react-navigation';
 
 interface State {
   url: string | null;
