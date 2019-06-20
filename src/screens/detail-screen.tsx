@@ -46,6 +46,7 @@ export default class DetailScreen extends React.Component<{}, State> {
       sessionId: null,
       loading: true,
       package: {
+        pid: 0,
         links: []
       }
     }
@@ -134,6 +135,52 @@ export default class DetailScreen extends React.Component<{}, State> {
           });
         }
         navigation.goBack();
+      })
+      .catch(error => console.log(error))
+  };
+
+  restartItem = (fid: number) => {
+    let formData = new FormData();
+    formData.append("session", this.state.sessionId);
+    fetch(this.state.url + "/api/restartFile/" + fid,
+      {
+        method: 'POST',
+        body: formData
+      }
+    )
+      .then(response => response.text())
+      .then((response) => {
+        if (response) {
+          Toast.show({
+            text: "Success",
+            buttonText: "Okay",
+            duration: 3000
+          });
+        }
+        this.loadDetails(this.state.sessionId, this.state.url, this.state.package.pid);
+      })
+      .catch(error => console.log(error))
+  };
+
+  deleteItem = (fid: number) => {
+    let formData = new FormData();
+    formData.append("session", this.state.sessionId);
+    fetch(this.state.url + "/api/deleteFiles/[" + fid + "]",
+      {
+        method: 'POST',
+        body: formData
+      }
+    )
+      .then(response => response.text())
+      .then((response) => {
+        if (response) {
+          Toast.show({
+            text: "Success",
+            buttonText: "Okay",
+            duration: 3000
+          });
+        }
+        this.loadDetails(this.state.sessionId, this.state.url, this.state.package.pid);
       })
       .catch(error => console.log(error))
   };
@@ -263,29 +310,17 @@ export default class DetailScreen extends React.Component<{}, State> {
                       </Body>
                     </CardItem>
                     <CardItem footer bordered>
-                      <Button transparent>
-                        <Icon active name="refresh" />
+                      <Button transparent onPress={() => this.restartItem(link.fid)}>
+                        <Icon active name="refresh"/>
                         <Text>Restart</Text>
                       </Button>
 
-                      <Button transparent danger>
-                        <Icon active name="close" />
+                      <Button transparent danger  onPress={() => this.deleteItem(link.fid)}>
+                        <Icon active name="close"/>
                         <Text>Delete</Text>
                       </Button>
                     </CardItem>
                   </Card>
-
-                  // return <ListItem key={link.fid}>
-                  //   <Body>
-                  //     <Text>{link.name}</Text>
-                  //     <Text>{link.statusmsg}</Text>
-                  //   </Body>
-                  //   <Right>
-                  //     <Button rounded small>
-                  //       <Icon active name="refresh"/>
-                  //     </Button>
-                  //   </Right>
-                  // </ListItem>
                 })}
               </List>
             </Content>

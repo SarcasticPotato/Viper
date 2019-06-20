@@ -1,5 +1,5 @@
 export interface Package {
-  pid?: number;
+  pid: number;
   name?: string;
   folder?: string;
   links: Link[];
