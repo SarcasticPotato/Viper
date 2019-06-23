@@ -5,6 +5,7 @@ import {QueueItem} from '../api/model/queueItem';
 import SideBar from '../components/side-bar';
 import {RefreshControl} from 'react-native';
 import {File} from '../api/model/file';
+import {FileComponent} from '../components/file';
 
 interface State {
   url: string | null;
@@ -151,6 +152,10 @@ export default class HomeScreen extends React.Component<{}, State> {
     this.loadQueue(this.state.sessionId, this.state.url).then(() => this.setState({refreshing: false}));
   };
 
+  deleteItem = (fid: number) => {
+    this.loadQueue(this.state.sessionId, this.state.url).then(() => this.setState({refreshing: false}));
+  };
+
   render() {
     // @ts-ignore
     const navigation = this.props.navigation;
@@ -185,7 +190,7 @@ export default class HomeScreen extends React.Component<{}, State> {
             <Text>No active downloads found!</Text>
             }
             <List>
-              {this.state.downloads.map((file) => <ListItem><Text>{file.name}</Text></ListItem>)}
+              {this.state.downloads.map((file) => <FileComponent sessionId={this.state.sessionId} url={this.state.url} file={file} _handleDelete={this.deleteItem.bind(this)} />)}
             </List>
           </Content>
         </Container>

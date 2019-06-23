@@ -2,7 +2,7 @@ import React from "react";
 import {Button, Container, Content, Footer, FooterTab, Icon, List, ListItem, Text} from "native-base";
 import AsyncStorage from '@react-native-community/async-storage';
 
-const routes = ["Home", "Queue"];
+const routes = ["Home", "Queue", "Settings"];
 
 export default class SideBar extends React.Component<{ navigation: any }> {
   render() {
@@ -21,9 +21,9 @@ export default class SideBar extends React.Component<{ navigation: any }> {
             dataArray={routes}
             renderRow={data => {
               return (
-                <ListItem
-                  button
-                  onPress={() => navigation.navigate(data)}>
+                <ListItem selected={navigation.state.routeName == data}
+                          button
+                          onPress={() => navigation.navigate(data)}>
                   <Text>{data}</Text>
                 </ListItem>
               );
@@ -33,7 +33,7 @@ export default class SideBar extends React.Component<{ navigation: any }> {
         <Footer>
           <FooterTab>
             <Button onPress={() => _logout()}>
-              <Icon name="log-out" /><Text>Logout</Text>
+              <Icon name="log-out"/><Text>Logout</Text>
             </Button>
           </FooterTab>
         </Footer>
