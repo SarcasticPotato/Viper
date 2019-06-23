@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Body, Button, Container, Content, Drawer, Header, Icon, Left, List, ListItem, Spinner, Title, Toast, Text} from 'native-base';
+import {Body, Button, Container, Content, Drawer, Header, Icon, Left, List, ListItem, Spinner, Text, Title, Toast} from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import {QueueItem} from '../api/model/queueItem';
 import SideBar from '../components/side-bar';
@@ -181,6 +181,9 @@ export default class HomeScreen extends React.Component<{}, State> {
           </Content>
           }
           <Content padder refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this._onRefresh()}/>}>
+            {this.state.downloads.length == 0 &&
+            <Text>No active downloads found!</Text>
+            }
             <List>
               {this.state.downloads.map((file) => <ListItem><Text>{file.name}</Text></ListItem>)}
             </List>

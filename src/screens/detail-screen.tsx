@@ -3,8 +3,6 @@ import {
   ActionSheet,
   Body,
   Button,
-  Card,
-  CardItem,
   Col,
   Container,
   Content,
@@ -26,6 +24,7 @@ import {
 } from 'native-base';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Package} from '../api/model/package';
+import {FileComponent} from '../components/file';
 
 var BUTTONS = ["Restart Package", "Delete Package", "Refresh", "Cancel"];
 var CANCEL_INDEX = 3;
@@ -163,26 +162,7 @@ export default class DetailScreen extends React.Component<{}, State> {
   };
 
   deleteItem = (fid: number) => {
-    let formData = new FormData();
-    formData.append("session", this.state.sessionId);
-    fetch(this.state.url + "/api/deleteFiles/[" + fid + "]",
-      {
-        method: 'POST',
-        body: formData
-      }
-    )
-      .then(response => response.text())
-      .then((response) => {
-        if (response) {
-          Toast.show({
-            text: "Success",
-            buttonText: "Okay",
-            duration: 3000
-          });
-        }
-        this.loadDetails(this.state.sessionId, this.state.url, this.state.package.pid);
-      })
-      .catch(error => console.log(error))
+    this.loadDetails(this.state.sessionId, this.state.url, this.state.package.pid);
   };
 
   render() {
@@ -299,28 +279,9 @@ export default class DetailScreen extends React.Component<{}, State> {
           <Tab heading="Links">
             <Content>
               <List>
-                {this.state.package.links.map((link) => {
-                  return <Card key={link.fid}>
-                    <CardItem header bordered>
-                      <Text>{link.name}</Text>
-                    </CardItem>
-                    <CardItem bordered>
-                      <Body>
-                        <Text>Status: {link.statusmsg}</Text>
-                      </Body>
-                    </CardItem>
-                    <CardItem footer bordered>
-                      <Button transparent onPress={() => this.restartItem(link.fid)}>
-                        <Icon active name="refresh"/>
-                        <Text>Restart</Text>
-                      </Button>
-
-                      <Button transparent danger  onPress={() => this.deleteItem(link.fid)}>
-                        <Icon active name="close"/>
-                        <Text>Delete</Text>
-                      </Button>
-                    </CardItem>
-                  </Card>
+                {this.state.package.links.map((file) => {
+                  return <FileComponent file={file} sessionId={this.state.sessionId} _handleDelete={this.deleteItem.bind(this)}
+                                        url={this.state.url} key={file.fid}/>
                 })}
               </List>
             </Content>
